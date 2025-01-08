@@ -1,0 +1,129 @@
+# Create Statement
+
+SQL Statements:
+CREATE TABLE Employee (
+EmployeeID INT AUTO_INCREMENT PRIMARY KEY,
+FirstName VARCHAR(50) NOT NULL,
+LastName VARCHAR(20) NOT NULL,
+HireDate DATE,
+JobTitle VARCHAR(50),
+ManagerID INT,
+StoreID VARCHAR(50),
+Salary DECIMAL(10, 2),
+ContractType VARCHAR(50),
+ContractHours INT,
+AuthType VARCHAR(50),
+EmploymentStatus VARCHAR(50) DEFAULT 'Active',
+FOREIGN KEY (StoreID) REFERENCES Store(StoreID)
+);
+CREATE TABLE PersonalDetails (
+EmployeeID INT NOT NULL PRIMARY KEY,
+NationalIDNumber VARCHAR(50) UNIQUE,
+Gender VARCHAR(10),
+Address TEXT,
+DateOfBirth DATE,
+PersonalEmail VARCHAR(100),
+PhoneNumber VARCHAR(20),
+);
+CREATE TABLE Store (
+StoreID VARCHAR(50) PRIMARY KEY,
+StoreName VARCHAR(255) NOT NULL,
+FacilityType VARCHAR(50),
+Address TEXT,
+PhoneNumber VARCHAR(20),
+OpeningHours VARCHAR(20),
+ClosingHours VARCHAR(20),
+EmployeeCount INT,
+);
+CREATE TABLE Customer (
+CustomerID INT AUTO_INCREMENT PRIMARY KEY,
+CustomerName VARCHAR(100) NOT NULL,
+Email VARCHAR(100) UNIQUE NOT NULL,
+Phone VARCHAR(20),
+Address TEXT,
+CustomerType VARCHAR(50) DEFAULT 'Individual',
+AccPassword VARCHAR(25),
+);
+CREATE TABLE 'Order' (
+OrderID INT AUTO_INCREMENT PRIMARY KEY,
+CustomerID INT NOT NULL,
+OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+OrderStatus VARCHAR(20) DEFAULT 'Pending',
+ShippingAddress TEXT,
+TransactionID INT,
+TrackingNumber VARCHAR(50),
+FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+FOREIGN KEY (TransactionID) REFERENCES Payments(TransactionID)
+FOREIGN KEY (TrackingNumber) REFERENCES ShippingDetails(TrackingNumber)
+);
+CREATE TABLE Payments (
+TransactionID INT PRIMARY KEY,
+OrderID INT NOT NULL,
+PaymentDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+PaymentMethod VARCHAR(50) DEFAULT 'Credit Card',
+PaymentStatus VARCHAR(50) DEFAULT 'Pending',
+TotalAmountPaid DECIMAL(10, 2) NOT NULL,
+FOREIGN KEY (OrderID) REFERENCES 'Order'(OrderID)
+);
+CREATE TABLE ShippingDetails (
+TrackingNumber VARCHAR(50) PRIMARY KEY UNIQUE,
+OrderID INT NOT NULL,
+ShippingAddress TEXT NOT NULL,
+ShippingPartner VARCHAR(100),
+ShippingCost DECIMAL(10, 2) NOT NULL,
+ShippedDate DATETIME,
+EstimatedDeliveryDate DATETIME,
+Status VARCHAR(50) DEFAULT 'Pending',
+FOREIGN KEY (OrderID) REFERENCES `Order`(OrderID)
+);
+CREATE TABLE ProductOrder (
+OrderID INT NOT NULL,
+ProductID INT NOT NULL,
+FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+CREATE TABLE WarrantyClaim (
+ProductID INT NOT NULL,
+OrderID INT NOT NULL,
+WarrentyClaimStatus VARCHAR(50) DEFAULT 'Pending', -- Default status when a warranty is created
+FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+FOREIGN KEY (OrderID) REFERENCES 'Order'(OrderID)
+);
+CREATE TABLE Products (
+ProductID INT AUTO_INCREMENT PRIMARY KEY,
+ProductName VARCHAR(100) NOT NULL,
+ProductDesc TEXT,
+ProductType VARCHAR(50),
+BatchID VARCHAR(20),
+CostPrice DECIMAL(10, 2) NOT NULL,
+SellingPrice DECIMAL(10, 2) NOT NULL,
+WarrentyPeriod VARCHAR(55),
+SKU VARCHAR(100) UNIQUE,
+);
+CREATE TABLE Inventory (
+ProductID INT PRIMARY KEY,
+TotalStock INT DEFAULT 0,
+EdinburghStock INT DEFAULT 0,
+BriminghamStock INT DEFAULT 0,
+);
+CREATE TABLE Material (
+MaterialID INT PRIMARY KEY AUTO_INCREMENT,
+MaterialName VARCHAR(20) NOT NULL,
+MaterialType VARCHAR(50),
+UnitCost DECIMAL(10, 2),
+);
+CREATE TABLE Suppliers (
+SupplierID INT AUTO_INCREMENT PRIMARY KEY,
+SupplierName VARCHAR(50) NOT NULL,
+ContactName VARCHAR(50),
+ContactPhone VARCHAR(20),
+ContactEmail VARCHAR(100),
+MaterialID INT NOT NULL,
+FOREIGN KEY (MaterialID) REFERENCES MaterialType(MaterialID)
+);
+CREATE TABLE ProductMaterial (
+ProductID INT NOT NULL,
+MaterialID INT NOT NULL,
+FOREIGN KEY (MaterialID) REFERENCES Material(MaterialID),
+FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
