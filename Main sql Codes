@@ -1,0 +1,122 @@
+# Product Stock: Check how much stock is available for a product that the customer enquires about
+
+SELECT
+p.ProductName,
+p.ProductType,
+i.EdiStock,
+i.BirStock
+FROM Product p
+JOIN
+Inventory i ON p.ProductID = i.ProductID
+WHERE p.ProductID = 859;
+
+# Inventory Adjustment: Update inventory levels after returns or damage.
+
+## User will enter the orderID and below UI will be displayed.
+SELECT
+od.ProductID,
+p.ProductName,
+od.Quantity
+FROM OrderDetails od
+JOIN
+Product p ON od.ProductID = p.ProductID
+WHERE od.OrderID = 10057;
+
+### Clicking on Return button, the following query will run:
+
+START TRANSACTION;
+UPDATE Inventory
+SET EdiStock = EdiStock + 1
+WHERE ProductID = 909;
+DELETE FROM OrderDetails
+WHERE OrderID = 10057 AND ProductID = 909;
+COMMIT;
+
+# Check the sales report for the month of October
+
+select sum(Quantity * UnitPrice) as TotalSales
+from OrderDetails
+join OrderTable on OrderDetails.OrderID = OrderTable.OrderID
+where OrderTable.OrderDate between '2024-10-01' and '2024-10-
+
+# Remove the order that has been placed mistakenly if not paid:
+
+delete from OrderTable where OrderID = 10067;
+
+# Shipment Tracking: Check the Pending shipments to prepare the ordered product to be sent to customer’s address and once done, update the Status.
+
+select Status, OrderID, ShippingAddress, TrackingID, ShippingPartner from Shipping where
+Status = "Pending"
+
+## Now the following query will modify the order status from pending to shipped:
+update Shipping set Status = 'Shipped' where OrderID = 10016;
+
+# Read: Check for the products that are below 10, so that it can be reproduced again
+
+Select Product.ProductID, Product.ProductName, Product.ProductType, Product.SellingPrice,
+Inventory.EdiStock, Inventory.TotalStockSold
+from Inventory
+Join Product on Inventory.ProductID = Product.ProductID
+Where Inventory.EdiStock < 10;
+
+# Delete an old product's details from both the Products table and the Inventory table simultaneously
+
+start transaction;
+delete from Inventory where ProductID = 870;
+delete from Product where ProductID = 870;
+commit;
+
+# View Real-Time Sales Trends: Check the Top 5 products
+SELECT Product.ProductName, Product.CostPrice, Product.SellingPrice,
+Inventory.TotalStockSold
+FROM Product
+JOIN Inventory ON Product.ProductID = Inventory.ProductID
+ORDER BY Inventory.TotalStockSold DESC
+LIMIT 5;
+
+# View total profit by product type:
+
+SELECT
+p.ProductType,
+SUM(od.Quantity * od.UnitPrice) AS TotalRevenue,
+SUM(od.Quantity * p.CostPrice) AS TotalCost,
+SUM(od.Quantity * (od.UnitPrice - p.CostPrice)) AS TotalProfit
+FROM Product p
+JOIN OrderDetails od ON p.ProductID = od.ProductID
+GROUP BY p.ProductType
+ORDER BY TotalProfit DESC;
+
+
+# Storewise sales revenue:
+
+SELECT StoreID, SUM(Quantity * UnitPrice) AS TotalSales
+FROM OrderDetails od
+JOIN OrderTable o ON od.OrderID = o.OrderID
+WHERE
+o.OrderDate BETWEEN '2023-01-01' AND '2024-12-31'
+GROUP BY StoreID
+ORDER BY TotalSales DESC;
+
+View overall product performance report:
+SELECT
+p.ProductID,
+p.ProductName,
+COALESCE(SUM(od.Quantity), 0) AS TotalUnitsSold,
+COALESCE(SUM((od.Quantity * od.UnitPrice) - (od.Quantity * p.CostPrice)), 0) AS
+TotalProfit,
+CASE
+WHEN COALESCE(SUM(od.Quantity), 0) = 0 THEN 'Needs Attention'
+WHEN COALESCE(SUM(od.Quantity), 0) < 3 THEN 'Stable'
+ELSE 'Trending'
+END AS TrendStatus
+FROM Product p
+LEFT JOIN
+OrderDetails od ON p.ProductID = od.ProductID
+GROUP BY p.ProductID, p.ProductName, p.ProductType
+ORDER BY TotalUnitsSold DESC;
+
+# View and edit Profile:
+
+UPDATE Customer SET Address = '754 Queens Road, London', Phone = '7745378920'
+WHERE CustomerID = 9406; 
+
